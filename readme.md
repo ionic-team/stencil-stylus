@@ -10,10 +10,12 @@ npm install @stencil/stylus --save-dev
 
 Next, within the project's `stencil.config.js` file, import the plugin and add it to the config's `plugins` config:
 
-```js
-const stylus = require('@stencil/stylus');
+#### stencil.config.ts
+```ts
+import { Config } from '@stencil/core';
+import { stylus } from '@stencil/stylus';
 
-exports.config = {
+export const config: Config = {
   plugins: [
     stylus()
   ]
