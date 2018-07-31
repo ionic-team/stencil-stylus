@@ -7,9 +7,9 @@ export interface PluginTransformResults {
 
 export interface PluginCtx {
   config: {
-    rootDir: string;
-    srcDir: string;
-    devMode: boolean;
+    rootDir?: string;
+    srcDir?: string;
+    devMode?: boolean;
   };
   fs: any;
   diagnostics: Diagnostic[];
@@ -17,13 +17,15 @@ export interface PluginCtx {
 
 export interface Diagnostic {
   level: 'error' | 'warn' | 'info' | 'log' | 'debug';
-  type: string;
+  type: 'typescript' | 'bundling' | 'build' | 'runtime' | 'hydrate' | 'css';
   header?: string;
+  language?: string;
   messageText: string;
-  language?: 'javascript' | 'typescript' | 'stylus' | 'css';
   code?: string;
   absFilePath?: string;
   relFilePath?: string;
+  lineNumber?: number;
+  columnNumber?: number;
   lines?: PrintLine[];
 }
 
@@ -31,7 +33,6 @@ export interface PrintLine {
   lineIndex: number;
   lineNumber: number;
   text?: string;
-  html?: string;
   errorCharStart: number;
   errorLength?: number;
 }

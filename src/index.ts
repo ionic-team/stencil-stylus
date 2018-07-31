@@ -4,11 +4,11 @@ import * as d from './declarations';
 import * as util from './util';
 
 
-module.exports = function stylus(opts: d.PluginOptions = {}) {
+export function stylus(opts: d.PluginOptions = {}) {
 
   return {
-
-    transform: function (sourceText: string, fileName: string, context: d.PluginCtx) {
+    name: 'stylus',
+    transform(sourceText: string, fileName: string, context: d.PluginCtx) {
       if (!context || !util.usePlugin(fileName)) {
         return null;
       }
@@ -54,10 +54,6 @@ module.exports = function stylus(opts: d.PluginOptions = {}) {
           }
         });
       });
-    },
-
-    name: 'stylus',
-
+    }
   };
-
-};
+}

@@ -14,7 +14,7 @@ export function loadDiagnostic(context: d.PluginCtx, stylusError: any, filePath:
 
   const diagnostic: d.Diagnostic = {
     level: 'error',
-    type: 'stylus',
+    type: 'css',
     language: 'stylus',
     header: 'stylus error',
     code: stylusError.status && stylusError.status.toString(),
