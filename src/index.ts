@@ -29,6 +29,7 @@ export function stylus(opts: d.PluginOptions = {}) {
         const styl = stylusCompiler(sourceText);
 
         styl.set('filename', fileName);
+        styl.set('dest', fileName.replace('.styl', '.css'));
         styl.set('compress', !context.config.devMode);
         styl.set('paths', renderOpts.includePaths);
 
