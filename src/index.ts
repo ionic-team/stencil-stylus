@@ -4,10 +4,11 @@ import * as d from './declarations';
 import * as util from './util';
 
 
-export function stylus(opts: d.PluginOptions = {}) {
+export function stylus(opts: d.PluginOptions = {}): d.Plugin {
 
   return {
     name: 'stylus',
+    pluginType: 'css',
     transform(sourceText: string, fileName: string, context: d.PluginCtx) {
       if (!context || !util.usePlugin(fileName)) {
         return null;
