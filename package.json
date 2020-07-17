@@ -20,7 +20,7 @@
     "test.watch": "jest --watch"
   },
   "dependencies": {
-    "stylus": "0.54.5"
+    "stylus": "0.54.8"
   },
   "peerDependencies": {
     "@stencil/core": "^1.0.2"
