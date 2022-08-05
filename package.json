@@ -23,7 +23,8 @@
     "fmt": "npm run eslint -- --fix && npm run prettier -- --write"
   },
   "dependencies": {
-    "stylus": "0.58.1"
+    "stylus": "0.58.1",
+    "ts-jest": "^28.0.7"
   },
   "peerDependencies": {
     "@stencil/core": "^2.17.3"
@@ -52,21 +53,5 @@
   "keywords": [
     "stencil",
     "stylus"
-  ],
-  "jest": {
-    "transform": {
-      "^.+\\.(js|ts|tsx)$": "<rootDir>/test/jest.preprocessor.js"
-    },
-    "testRegex": "(\\.(test|spec))\\.(tsx?|jsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "json",
-      "jsx"
-    ],
-    "testEnvironmentOptions": {
-      "url": "http://localhost"
-    }
-  }
+  ]
 }

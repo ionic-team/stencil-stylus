@@ -1,22 +1,29 @@
 import * as d from './declarations';
 import * as path from 'path';
 
-
 export function usePlugin(fileName: string) {
-  return /(\.styl|\.stylus)$/i.test(fileName);
+  if (typeof fileName === 'string') {
+    return /(\.styl)$/i.test(fileName);
+  }
+  return true;
 }
 
+export function getRenderOptions(opts: d.PluginOptions, sourceText: string, fileName: string, context: d.PluginCtx) {
+  // create a copy of the original styl config so we don't change it
+  const renderOpts = Object.assign({}, opts);
 
-export function getRenderOptions(opts: d.PluginOptions, fileName: string, context: d.PluginCtx): d.RenderOpts {
-  let includePaths = Array.isArray(opts.includePaths) ? opts.includePaths.slice() : [];
+  // always set "data" from the source text
+  renderOpts.data = sourceText;
+
+  // activate indented syntax if the file extension is .styl
+  renderOpts.indentedSyntax = /(\.styl)$/i.test(fileName);
+
+  renderOpts.includePaths = Array.isArray(opts.includePaths) ? opts.includePaths.slice() : [];
 
   // add the directory of the source file to includePaths
-  includePaths.unshift(path.dirname(fileName));
+  renderOpts.includePaths.push(path.dirname(fileName));
 
-  // add the root directory to includePaths
-  includePaths.unshift(context.config.rootDir);
-
-  includePaths = includePaths.map(includePath => {
+  renderOpts.includePaths = renderOpts.includePaths.map((includePath) => {
     if (path.isAbsolute(includePath)) {
       return includePath;
     }
@@ -26,15 +33,40 @@ export function getRenderOptions(opts: d.PluginOptions, fileName: string, contex
 
   const injectGlobalPaths = Array.isArray(opts.injectGlobalPaths) ? opts.injectGlobalPaths.slice() : [];
 
-  const plugins = opts.plugins || [];
+  if (injectGlobalPaths.length > 0) {
+    // automatically inject each of these paths into the source text
+    const injectText = injectGlobalPaths
+      .map((injectGlobalPath) => {
+        if (!path.isAbsolute(injectGlobalPath)) {
+          // convert any relative paths to absolute paths relative to the project root
 
-  return {
-    includePaths,
-    injectGlobalPaths,
-    plugins
-  };
+          if (context.sys && typeof context.sys.normalizePath === 'function') {
+            // context.sys.normalizePath added in stencil 1.11.0
+            injectGlobalPath = context.sys.normalizePath(path.join(context.config.rootDir, injectGlobalPath));
+          } else {
+            // TODO, eventually remove normalizePath() from @stencil/styl
+            injectGlobalPath = normalizePath(path.join(context.config.rootDir, injectGlobalPath));
+          }
+        }
+
+        const importTerminator = renderOpts.indentedSyntax ? '\n' : ';';
+
+        return `@import "${injectGlobalPath}"${importTerminator}`;
+      })
+      .join('');
+
+    renderOpts.data = injectText + renderOpts.data;
+  }
+
+  // remove non-standard styl option
+  delete renderOpts.injectGlobalPaths;
+
+  // the "file" config option is not valid here
+  delete renderOpts.file;
+
+
+  return renderOpts;
 }
-
 
 export function createResultsId(fileName: string) {
   // create what the new path is post transform (.css)
@@ -42,3 +74,59 @@ export function createResultsId(fileName: string) {
   pathParts[pathParts.length - 1] = 'css';
   return pathParts.join('.');
 }
+
+export function normalizePath(str: string) {
+  // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
+  // https://github.com/sindresorhus/slash MIT
+  // By Sindre Sorhus
+  if (typeof str !== 'string') {
+    throw new Error(`invalid path to normalize`);
+  }
+  str = str.trim();
+
+  if (EXTENDED_PATH_REGEX.test(str) || NON_ASCII_REGEX.test(str)) {
+    return str;
+  }
+
+  str = str.replace(SLASH_REGEX, '/');
+
+  // always remove the trailing /
+  // this makes our file cache look ups consistent
+  if (str.charAt(str.length - 1) === '/') {
+    const colonIndex = str.indexOf(':');
+    if (colonIndex > -1) {
+      if (colonIndex < str.length - 2) {
+        str = str.substring(0, str.length - 1);
+      }
+    } else if (str.length > 1) {
+      str = str.substring(0, str.length - 1);
+    }
+  }
+
+  return str;
+}
+
+export function getModuleId(orgImport: string) {
+  if (orgImport.startsWith('~')) {
+    orgImport = orgImport.substring(1);
+  }
+  const splt = orgImport.split('/');
+  const m = {
+    moduleId: null as string,
+    filePath: null as string,
+  };
+
+  if (orgImport.startsWith('@') && splt.length > 1) {
+    m.moduleId = splt.slice(0, 2).join('/');
+    m.filePath = splt.slice(2).join('/');
+  } else {
+    m.moduleId = splt[0];
+    m.filePath = splt.slice(1).join('/');
+  }
+
+  return m;
+}
+
+const EXTENDED_PATH_REGEX = /^\\\\\?\\/;
+const NON_ASCII_REGEX = /[^\x00-\x80]+/;
+const SLASH_REGEX = /\\/g;
