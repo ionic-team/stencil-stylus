@@ -15,28 +15,32 @@
     "rollup": "rollup -c",
     "version": "npm run build",
     "release": "np",
-    "lint": "tslint --project tsconfig.json",
     "test": "jest",
-    "test.watch": "jest --watch"
+    "test.watch": "jest --watch",
+    "prettier": "prettier \"**/*.ts\"",
+    "eslint": "eslint . --ext .ts",
+    "lint": "npm run eslint && npm run prettier -- --check",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write"
   },
   "dependencies": {
-    "stylus": "0.54.8"
+    "stylus": "0.58.1"
   },
   "peerDependencies": {
-    "@stencil/core": "^1.0.2"
+    "@stencil/core": "^2.17.3"
   },
   "devDependencies": {
-    "@stencil/core": "^1.0.2",
-    "@types/jest": "^24.0.13",
-    "@types/node": "^12.0.7",
-    "@types/stylus": "^0.48.29",
-    "jest": "^24.8.0",
-    "np": "^5.0.3",
-    "rimraf": "^2.6.2",
-    "rollup": "^1.14.4",
-    "tslint": "^5.9.1",
-    "tslint-ionic-rules": "0.0.21",
-    "typescript": "^3.5.1"
+    "@ionic/eslint-config": "^0.3.0",
+    "@ionic/prettier-config": "^2.0.0",
+    "@stencil/core": "^2.17.3",
+    "@types/jest": "^28.1.6",
+    "@types/node": "^18.6.4",
+    "@types/stylus": "^0.48.38",
+    "eslint": "^7.32.0",
+    "jest": "^28.1.3",
+    "np": "^7.6.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.77.2",
+    "typescript": "^4.7.4"
   },
   "repository": {
     "type": "git",
@@ -61,6 +65,10 @@
       "json",
       "jsx"
     ],
+    "eslintConfig": {
+      "extends": "@ionic/eslint-config/recommended"
+    },
+    "prettier": "@ionic/prettier-config",
     "testURL": "http://localhost"
   }
 }
