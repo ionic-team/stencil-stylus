@@ -65,10 +65,8 @@
       "json",
       "jsx"
     ],
-    "eslintConfig": {
-      "extends": "@ionic/eslint-config/recommended"
-    },
-    "prettier": "@ionic/prettier-config",
-    "testURL": "http://localhost"
+    "testEnvironmentOptions": {
+      "url": "http://localhost"
+    }
   }
 }
